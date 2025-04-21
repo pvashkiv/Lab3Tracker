@@ -1,7 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, Button, FlatList, TouchableOpacity} from 'react-native';
-import {DbService} from './src/service/db.service.ts';
-import {EntryService} from './src/service/entry.service.ts'; // шлях до файлу з DB
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import { DbService } from './src/service/db.service.ts';
+import { EntryService } from './src/service/entry.service.ts';
 
 interface Entry {
   id: number;
@@ -43,7 +50,6 @@ const WorkTimeTracker: React.FC = () => {
       });
 
       await fetchEntries();
-
       setIsTracking(false);
       setStartTime(null);
     }
@@ -55,10 +61,8 @@ const WorkTimeTracker: React.FC = () => {
   };
 
   return (
-    <View style={{padding: 20, marginTop: 60}}>
-      <Text style={{fontSize: 24, fontWeight: 'bold', marginBottom: 10}}>
-        Work Time Tracker
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Work Time Tracker</Text>
 
       <Button
         title={isTracking ? 'Stop' : 'Start'}
@@ -67,34 +71,27 @@ const WorkTimeTracker: React.FC = () => {
 
       <FlatList
         data={entries}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => {
-          const start = new Date(item.startTime).toLocaleTimeString();
-          const end = new Date(item.endTime).toLocaleTimeString();
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => {
+          const start = new Date(item.startTime);
+          const end = new Date(item.endTime);
+
+          const dateStr = start.toLocaleDateString();
+          const startTimeStr = start.toLocaleTimeString();
+          const endTimeStr = end.toLocaleTimeString();
 
           return (
-            <View
-              style={{
-                padding: 10,
-                borderBottomWidth: 1,
-                borderBottomColor: '#ccc',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
+            <View style={styles.entryContainer}>
               <View>
-                <Text>Start: {start}</Text>
-                <Text>End: {end}</Text>
+                <Text>Date: {dateStr}</Text>
+                <Text>Start: {startTimeStr}</Text>
+                <Text>End: {endTimeStr}</Text>
                 <Text>Duration: {item.duration.toFixed(2)} sec</Text>
               </View>
               <TouchableOpacity
                 onPress={() => handleDeleteEntry(item.id)}
-                style={{
-                  backgroundColor: 'red',
-                  padding: 8,
-                  borderRadius: 5,
-                }}>
-                <Text style={{color: 'white'}}>Delete</Text>
+                style={styles.deleteButton}>
+                <Text style={{ color: 'white' }}>Delete</Text>
               </TouchableOpacity>
             </View>
           );
@@ -103,5 +100,30 @@ const WorkTimeTracker: React.FC = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    marginTop: 60,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  entryContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 8,
+    borderRadius: 5,
+  },
+});
 
 export default WorkTimeTracker;
